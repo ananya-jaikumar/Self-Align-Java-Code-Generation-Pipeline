@@ -1,0 +1,2809 @@
+### System: I->R
+You are an extremely intelligent AI coding assistant. Please provide an accurate and reliable response to each user instruction. After delivering your response, verify its consistency and correctness by writing a series of executable tests.
+
+### System: C->I
+Create a series of independent coding tasks that are original, distinct, diverse, and high-quality, fostering logical thinking. Each task must adhere to specified properties:
+
+- category: the type of task (e.g., function implementation, class implementation, or program implementation)
+- language: the programming language to be used
+- difficulty: the complexity level of the task (e.g., easy, medium, or hard)
+- concepts: fundamental principles and techniques the task is designed to incorporate, which developers must understand to effectively solve the task
+
+Design the tasks so that the relevant concepts emerge naturally as the most appropriate solutions, without explicitly mentioning that a particular concept should be used.
+
+### System: S->C
+Extract key programming concepts from the provided code snippet. Programming concepts refer to the foundational principles and techniques used in programming, which are crucial for developers to master. List these concepts in a comma-separated format.
+
+### System: S->I
+Gain inspiration from the given code snippets and create a series of independent coding tasks that are original, distinct, diverse, and high-quality, fostering logical thinking.
+
+### Example 1
+[Code]
+public class Encoder {
+
+    public static String encodeIntegerToChars(int value) {
+        if (value == 0) {
+            return Character.toString((char) 63);
+        }
+
+        StringBuilder encodedChars = new StringBuilder();
+        while (value > 0) {
+            int chunk = (value & 31) + 63;
+            value >>= 5;
+            if (value > 0) {
+                chunk |= 32;
+            }
+            encodedChars.append((char) chunk);
+        }
+
+        return encodedChars.reverse().toString();
+    }
+}
+
+[Property]
+category: function implementation
+language: Java
+difficulty: medium
+concepts: bitwise encoding, 5-bit chunking, ASCII manipulation, continuation bits
+
+[Instruction]
+Write a Java method to encode an integer into a sequence of encoded characters, where each character represents a 5-bit chunk of the integer. Each chunk should be added to 63 to convert it to a printable ASCII character. All but the last chunk must set the 6th bit (value 32) to signal continuation. The method should use bitwise operations and return the encoded string.
+
+[Response]
+To encode an integer into a sequence of encoded characters using Java:
+
+1. **Extract 5-bit chunks**: Use bitwise AND (`& 31`) to isolate the last 5 bits of the integer.
+2. **Set the continuation bit**: For all chunks except the last, set bit 6 using OR (`| 32`).
+3. **Convert to character**: Add 63 to shift into the printable ASCII range, and cast to `char`.
+4. **Shift**: Right-shift the value by 5 to move to the next 5-bit group.
+5. **Reverse the result**: Since we process LSB first, we reverse the characters before returning.
+
+Here’s the implementation:
+
+```java
+public class Encoder {
+
+    public static String encodeIntegerToChars(int value) {
+        if (value == 0) {
+            return Character.toString((char) 63);
+        }
+
+        StringBuilder encodedChars = new StringBuilder();
+        while (value > 0) {
+            int chunk = (value & 31) + 63;
+            value >>= 5;
+            if (value > 0) {
+                chunk |= 32;
+            }
+            encodedChars.append((char) chunk);
+        }
+
+        return encodedChars.reverse().toString();
+    }
+}
+```
+This method assumes the input is a non-negative integer.
+
+[Tests]
+You can test the Java method like this:
+
+```java
+public class TestEncoder {
+    public static void main(String[] args) {
+        System.out.println(Encoder.encodeIntegerToChars(0));     // should print: ?
+        System.out.println(Encoder.encodeIntegerToChars(1));     // should print: @
+        System.out.println(Encoder.encodeIntegerToChars(31));    // should print: _
+        System.out.println(Encoder.encodeIntegerToChars(65));    // two-character output
+    }
+}
+```
+
+### Example 2
+[Code]
+public class BitwiseCeil {
+
+    /**
+     * Computes the ceiling of n / 2^b using only bitwise operations.
+     * Assumes n and b are non-negative integers.
+     */
+    public static int ceilShift(int n, int b) {
+        if (n < 0 || b < 0) {
+            throw new IllegalArgumentException("Inputs must be non-negative integers.");
+        }
+
+        int mask = (1 << b) - 1;
+        boolean divisible = (n & mask) == 0;
+        int result = n >> b;
+        if (!divisible) {
+            result += 1;
+        }
+        return result;
+    }
+}
+[Property]
+category: function implementation
+language: Java
+difficulty: medium
+concepts: bitwise operation for division, ceiling without division or float, input validation, non-negative integer checks
+
+[Instruction]
+Write a Java method ceilShift that computes the ceiling of n / 2^b using only bitwise operations. You should not use division, floating-point arithmetic, or any built-in rounding methods. Instead, use bit manipulation to determine if bits were shifted out, and increment the result accordingly. Include input validation to ensure that both n and b are non-negative integers.
+
+[Response]
+In this method, we compute the ceiling of n / 2^b without using division or floating-point arithmetic. Here’s how:
+
+Right shift n by b bits: this gives the floor of n / 2^b.
+
+Mask the lower b bits of n using (1 << b) - 1. If the result is not zero, then some bits were lost, meaning we need to increment the result to get the ceiling.
+
+Add 1 to the result if not divisible.
+
+Validate inputs: ensure n and b are non-negative.
+
+Here is the implementation:
+
+```java
+public class BitwiseCeil {
+
+    /**
+     * Computes the ceiling of n / 2^b using only bitwise operations.
+     * Assumes n and b are non-negative integers.
+     */
+    public static int ceilShift(int n, int b) {
+        if (n < 0 || b < 0) {
+            throw new IllegalArgumentException("Inputs must be non-negative integers.");
+        }
+
+        int mask = (1 << b) - 1;
+        boolean divisible = (n & mask) == 0;
+        int result = n >> b;
+        if (!divisible) {
+            result += 1;
+        }
+        return result;
+    }
+}
+```
+
+[Tests]
+Here are test cases you can use to verify the correctness of the method:
+
+```java
+public class TestBitwiseCeil {
+    public static void main(String[] args) {
+        System.out.println(BitwiseCeil.ceilShift(10, 3));  // Expected: 2
+        System.out.println(BitwiseCeil.ceilShift(17, 4));  // Expected: 2
+        System.out.println(BitwiseCeil.ceilShift(100, 5)); // Expected: 4
+        System.out.println(BitwiseCeil.ceilShift(0, 3));   // Expected: 0
+        System.out.println(BitwiseCeil.ceilShift(1, 0));   // Expected: 1
+    }
+}
+```
+
+
+
+### Example 3
+[Code]
+import java.util.ArrayList;
+import java.util.List;
+
+public class PrimeFinder {
+    private final List<Integer> primes;
+
+    public PrimeFinder() {
+        primes = new ArrayList<>();
+        primes.add(2);
+        primes.add(3);
+    }
+
+    private boolean isPrime(int num) {
+        if (num < 2) return false;
+        for (int prime : primes) {
+            if (prime * prime > num) break;
+            if (num % prime == 0) return false;
+        }
+        return true;
+    }
+
+    public int findNthPrimeMemoized(int n) {
+        if (n <= primes.size()) {
+            return primes.get(n - 1);
+        }
+
+        int current = primes.get(primes.size() - 1) + 2;
+        while (primes.size() < n) {
+            if (isPrime(current)) {
+                primes.add(current);
+            }
+            current += 2;
+        }
+
+        return primes.get(n - 1);
+    }
+}
+
+[[Property]
+category: class implementation
+language: Java
+difficulty: medium
+concepts: prime number memoization, efficient prime checking, nth-prime lookup
+
+[Instruction]
+Write a Java class with a method findNthPrimeMemoized(int n) that returns the nth prime number using memoization. The class should maintain an internal list of known primes to avoid recalculating previously found ones. The method should only check for new primes when needed and should use the known primes to check divisibility efficiently up to the square root of the number.
+
+[Response]
+This Java implementation achieves efficient nth-prime retrieval using memoization. It includes:
+
+primes list: Initialized with the first two primes, 2 and 3.
+
+isPrime(int): Checks divisibility only using cached primes and stops at square root logic.
+
+findNthPrimeMemoized(int):
+
+Returns directly if the nth prime is already cached.
+
+Otherwise, continues checking odd numbers and memoizes new primes as they are found.g by 2 for each prime check. This is sound since the cache is initialized with the first **two** primes, 2 and 3.
+
+Here is how you could implement such a class:
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+public class PrimeFinder {
+    private final List<Integer> primes;
+
+    public PrimeFinder() {
+        primes = new ArrayList<>();
+        primes.add(2);
+        primes.add(3);
+    }
+
+    private boolean isPrime(int num) {
+        if (num < 2) return false;
+        for (int prime : primes) {
+            if (prime * prime > num) break;
+            if (num % prime == 0) return false;
+        }
+        return true;
+    }
+
+    public int findNthPrimeMemoized(int n) {
+        if (n <= primes.size()) {
+            return primes.get(n - 1);
+        }
+
+        int current = primes.get(primes.size() - 1) + 2;
+        while (primes.size() < n) {
+            if (isPrime(current)) {
+                primes.add(current);
+            }
+            current += 2;
+        }
+
+        return primes.get(n - 1);
+    }
+}
+
+```
+
+[Tests]
+Here's how you can test this class by verifying that the class correctly finds the first few primes and that subsequent calls return the memoized results directly:
+
+```java
+public class TestPrimeFinder {
+    public static void main(String[] args) {
+        PrimeFinder pf = new PrimeFinder();
+        int[] expected = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29};
+        for (int i = 0; i < expected.length; i++) {
+            assert pf.findNthPrimeMemoized(i + 1) == expected[i];
+        }
+
+        // Test memoization: calling again should return instantly
+        for (int i = 0; i < expected.length; i++) {
+            assert pf.findNthPrimeMemoized(i + 1) == expected[i];
+        }
+    }
+}
+```
+
+### Example 4
+[Code]
+public class SpecialFormula {
+
+    // f1(a, b) = (a + 1) * (b + 1) - 1
+    public static int f1(int a, int b) {
+        return (a + 1) * (b + 1) - 1;
+    }
+
+    // f2(k) = based on whether k is even or odd
+    public static double f2(int k) {
+        if (k % 2 != 0) {
+            return ((k + 1) * (k + 1)) / 2.0 + k + 1;
+        } else {
+            return (k * k) / 2.0 + 2 * k + 1;
+        }
+    }
+
+    // Combined: f2(f1(a, b))
+    public static double f1F2Combined(int a, int b) {
+        int k = f1(a, b);
+        return f2(k);
+    }
+}
+
+[Property]
+category: function implementation
+language: Java
+difficulty: easy
+concepts: conditional arithmetic, formula application, function composition
+
+
+[Instruction]
+Here are two special formulas:
+
+$$
+f_1(a, b) = (a + 1) \cdot (b + 1) - 1
+$$
+
+$$
+f_2(k) = \begin{cases}
+    \frac{(k + 1)^2}{2} + k + 1 & \text{if } k \text{ is odd} \\
+    \frac{k^2}{2} + 2k + 1 & \text{if } k \text{ is even}
+\end{cases}
+$$
+
+[Instruction]
+Implement three Java methods:  
+1. `f1(int a, int b)` computes \( (a+1)\,(b+1) - 1 \).  
+2. `f2(int k)` applies a different formula depending on whether \(k\) is odd or even:  
+   - If odd: \(\frac{(k+1)^2}{2} + k + 1\).  
+   - If even: \(\frac{k^2}{2} + 2k + 1\).  
+3. `f1F2Combined(int a, int b)` returns `f2(f1(a,b))`.  
+Avoid importing extra libraries beyond basic arithmetic.
+
+
+[Response]
+This Java implementation defines two functions:
+
+f1(a, b): uses the first formula involving multiplication and subtraction.
+
+f2(k): conditionally applies one of two formulas depending on whether k is even or odd.
+
+f1F2Combined(a, b): composes the result by calling f1 and feeding it into f2.
+
+
+
+Here is the implementation:
+```java
+public class SpecialFormula {
+
+    public static int f1(int a, int b) {
+        return (a + 1) * (b + 1) - 1;
+    }
+
+    public static double f2(int k) {
+        if (k % 2 != 0) {
+            return ((k + 1) * (k + 1)) / 2.0 + k + 1;
+        } else {
+            return (k * k) / 2.0 + 2 * k + 1;
+        }
+    }
+
+    public static double f1F2Combined(int a, int b) {
+        return f2(f1(a, b));
+    }
+}
+```
+
+
+[Tests]
+To test this combined function, you can simply compare it with the direct application of `f2` to the result of `f1` for different values of `a` and `b`:
+
+```java
+public class TestSpecialFormula {
+    public static void main(String[] args) {
+        System.out.println(SpecialFormula.f1F2Combined(2, 3));
+        System.out.println(SpecialFormula.f1F2Combined(4, 5));
+        System.out.println(SpecialFormula.f1F2Combined(6, 7));
+
+        assert SpecialFormula.f1F2Combined(2, 3) == SpecialFormula.f2(SpecialFormula.f1(2, 3));
+        assert SpecialFormula.f1F2Combined(4, 5) == SpecialFormula.f2(SpecialFormula.f1(4, 5));
+        assert SpecialFormula.f1F2Combined(6, 7) == SpecialFormula.f2(SpecialFormula.f1(6, 7));
+    }
+}
+
+
+
+### Example 5
+[Code]
+public class BinarySearchInsert {
+
+    /**
+     * Finds the index to insert `target` into `nums` to maintain sorted order.
+     * If the target exists multiple times, any matching index is valid.
+     * If not found, returns the correct insertion point.
+     *
+     * @param nums   A sorted array of integers
+     * @param target The value to insert
+     * @return The index where target can be inserted
+     */
+    public static int searchInsertPosition(int[] nums, int target) {
+        int left = 0;
+        int right = nums.length - 1;
+
+        while (left <= right) {
+            int mid = (left + right) / 2;
+            if (nums[mid] == target) {
+                return mid;
+            } else if (nums[mid] < target) {
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+        return left;
+    }
+}
+
+[Property]
+category: function implementation
+language: Java
+difficulty: easy
+concepts: insertion point for a sorted array, binary search optimization
+
+[Instruction]
+Write a Java method that takes a sorted array and a target value, and returns a valid index where the target can be inserted to maintain the array’s sorted order. Ensure that the solution runs in logarithmic time using binary search. If the target exists at multiple indices, returning any valid index is acceptable.
+
+[Response]
+This Java implementation uses binary search to locate the position where the target should be inserted. If the target is found, its index is returned. Otherwise, when the loop ends, the `left` pointer holds the correct insertion index. This guarantees logarithmic time complexity and avoids linear traversal of the array.
+
+```java
+public class BinarySearchInsert {
+
+    /**
+     * Finds the index to insert `target` into `nums` to maintain sorted order.
+     * If the target exists multiple times, any matching index is valid.
+     * If not found, returns the correct insertion point.
+     *
+     * @param nums   A sorted array of integers
+     * @param target The value to insert
+     * @return The index where target can be inserted
+     */
+    public static int searchInsertPosition(int[] nums, int target) {
+        int left = 0;
+        int right = nums.length - 1;
+
+        while (left <= right) {
+            int mid = (left + right) / 2;
+            if (nums[mid] == target) {
+                return mid;
+            } else if (nums[mid] < target) {
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+        return left;
+    }
+}
+````
+
+[Tests]
+You can test the function with scenarios where the target is found at multiple indices and where the target is not present in the array:
+
+```java
+public class TestBinarySearchInsert {
+    public static void main(String[] args) {
+        int[] array = {1, 3, 5, 5, 6};
+
+        int pos1 = BinarySearchInsert.searchInsertPosition(array, 5);
+        assert pos1 == 2 || pos1 == 3;
+
+        assert BinarySearchInsert.searchInsertPosition(array, 2) == 1;
+        assert BinarySearchInsert.searchInsertPosition(array, 7) == 5;
+        assert BinarySearchInsert.searchInsertPosition(array, 0) == 0;
+
+        System.out.println("All test cases passed.");
+    }
+}
+
+```
+
+### Example 6
+[Code]
+import java.util.ArrayList;
+import java.util.List;
+
+class HuffmanNode {
+    public Character value; // only set for leaf nodes
+    public List<HuffmanNode> children = new ArrayList<>();
+
+    public HuffmanNode(Character value) {
+        this.value = value;
+    }
+
+    public HuffmanNode() {
+        this.value = null;
+    }
+
+    public boolean isLeaf() {
+        return children.isEmpty() && value != null;
+    }
+}
+
+public class HuffmanDecompressor {
+
+    /**
+     * Decompress Huffman-encoded binary data using a given Huffman tree.
+     *
+     * @param compressedData byte array where each byte is 0 or 1
+     * @param huffmanTree root node of the Huffman tree
+     * @return decoded data as byte array
+     */
+    public static byte[] huffmanDecompress(byte[] compressedData, HuffmanNode huffmanTree) {
+        List<Byte> result = new ArrayList<>();
+        HuffmanNode node = huffmanTree;
+
+        for (byte bit : compressedData) {
+            int index = bit; // should be 0 or 1
+            if (node.children.size() > index) {
+                node = node.children.get(index);
+            }
+
+            if (node.isLeaf()) {
+                result.add((byte) node.value.charValue());
+                node = huffmanTree;
+            }
+        }
+
+        // Convert List<Byte> to byte[]
+        byte[] output = new byte[result.size()];
+        for (int i = 0; i < result.size(); i++) {
+            output[i] = result.get(i);
+        }
+        return output;
+    }
+}
+
+
+[Property]
+category: function implementation
+language: Java
+difficulty: medium
+concepts: decoding compressed data, tree traversal, Huffman coding, byte array construction
+
+[Instruction]
+Write a Java method huffmanDecompress that takes a byte array of 0/1 values and a Huffman tree (where each node has a list of child nodes and optional character value). The method should return the uncompressed data as a byte array by traversing the tree according to the input bits. Restart from the root every time a leaf node is reached. You must also define the HuffmanNode class with a children list and an optional value.
+
+[Response]
+This implementation performs Huffman decompression using a general tree structure:
+
+Each node in the tree can have multiple children.
+
+A node with no children and a non-null value is treated as a leaf.
+
+The method walks the tree according to the bit sequence (0 or 1 values) in the input array.
+
+When it reaches a leaf, it adds the corresponding character to the result and restarts from the root.
+
+Here is the implementation:
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+class HuffmanNode {
+    public Character value;
+    public List<HuffmanNode> children = new ArrayList<>();
+
+    public HuffmanNode(Character value) {
+        this.value = value;
+    }
+
+    public HuffmanNode() {
+        this.value = null;
+    }
+
+    public boolean isLeaf() {
+        return children.isEmpty() && value != null;
+    }
+}
+
+public class HuffmanDecompressor {
+
+    public static byte[] huffmanDecompress(byte[] compressedData, HuffmanNode huffmanTree) {
+        List<Byte> result = new ArrayList<>();
+        HuffmanNode node = huffmanTree;
+
+        for (byte bit : compressedData) {
+            int index = bit;
+            if (node.children.size() > index) {
+                node = node.children.get(index);
+            }
+
+            if (node.isLeaf()) {
+                result.add((byte) node.value.charValue());
+                node = huffmanTree;
+            }
+        }
+
+        byte[] output = new byte[result.size()];
+        for (int i = 0; i < result.size(); i++) {
+            output[i] = result.get(i);
+        }
+        return output;
+    }
+}
+
+```
+
+In this implementation, each byte in `compressed_data` represents a bit, guiding the traversal of the Huffman tree. Characters are appended upon reaching leaf nodes and the result is then encoded to `bytes`.
+
+[Tests]
+Here is a basic test that builds a simple Huffman tree and decompresses a byte array:
+
+```java
+import java.util.Arrays;
+
+public class TestHuffmanDecompressor {
+    public static void main(String[] args) {
+        HuffmanNode root = new HuffmanNode();
+        HuffmanNode left = new HuffmanNode();
+        HuffmanNode right = new HuffmanNode();
+
+        root.children.add(left);
+        root.children.add(right);
+
+        left.children.add(new HuffmanNode('C')); // 00
+        left.children.add(new HuffmanNode('D')); // 01
+        right.children.add(new HuffmanNode('E')); // 10
+        right.children.add(new HuffmanNode('F')); // 11
+
+        // Compressed sequence: 0,1 (D), 0,0 (C), 1,1 (F)
+        byte[] compressed = {0, 1, 0, 0, 1, 1};
+        byte[] output = HuffmanDecompressor.huffmanDecompress(compressed, root);
+
+        System.out.println(Arrays.toString(output)); // Should print bytes for 'D', 'C', 'F'
+    }
+}
+
+assert huffman_decompress(compressed_data, root) == b'DCF'
+```
+
+### Example 7
+[Code]
+public class FileSizeFormatter {
+
+    /**
+     * Converts a byte size into a human-readable string representation.
+     * Supports units: bytes, KB, MB, GB, TB.
+     *
+     * @param sizeBytes size in bytes (can be negative)
+     * @return formatted string like "512.0KB"
+     */
+    public static String formatSize(long sizeBytes) {
+        String[] units = {"bytes", "KB", "MB", "GB", "TB"};
+        double num = Math.abs(sizeBytes);
+        int unitIndex = 0;
+
+        while (num >= 1024.0 && unitIndex < units.length - 1) {
+            num /= 1024.0;
+            unitIndex++;
+        }
+
+        String formatted = String.format("%.1f%s", num, units[unitIndex]);
+        return sizeBytes >= 0 ? formatted : "-" + formatted;
+    }
+}
+
+[Property]
+category: function implementation
+language: Java
+difficulty: easy
+concepts: arithmetic operations for size conversion, rounding numbers, dynamic unit selection, string formatting
+
+[Instruction]
+Write a Java method that takes a size in bytes and returns a human-readable string formatted to one decimal place using the most appropriate unit: "bytes", "KB", "MB", "GB", or "TB". The output should follow the pattern "{X.Y}{Unit}", such as "512.0KB" or "1.0MB". Handle negative values as well, with a "-" prefix.
+
+[Response]
+To convert a file size from bytes into a human-readable format in Java, we:
+1. Define an array of units from bytes to terabytes.
+2. Use a loop to divide the size by 1024 while increasing the unit index.
+3. Format the result to one decimal place using `String.format`.
+4. Support both positive and negative input sizes.
+
+Here’s the implementation:
+
+```java
+public class FileSizeFormatter {
+
+    /**
+     * Converts a byte size into a human-readable string representation.
+     * Supports units: bytes, KB, MB, GB, TB.
+     *
+     * @param sizeBytes size in bytes (can be negative)
+     * @return formatted string like "512.0KB"
+     */
+    public static String formatSize(long sizeBytes) {
+        String[] units = {"bytes", "KB", "MB", "GB", "TB"};
+        double num = Math.abs(sizeBytes);
+        int unitIndex = 0;
+
+        while (num >= 1024.0 && unitIndex < units.length - 1) {
+            num /= 1024.0;
+            unitIndex++;
+        }
+
+        String formatted = String.format("%.1f%s", num, units[unitIndex]);
+        return sizeBytes >= 0 ? formatted : "-" + formatted;
+    }
+}
+
+[Tests]
+We can write tests that cover both positive and negative sizes across different units to validate the correctness of the `format_size` function:
+
+```java
+public class TestFileSizeFormatter {
+    public static void main(String[] args) {
+        assert FileSizeFormatter.formatSize(1024 * 512).equals("512.0KB");
+        assert FileSizeFormatter.formatSize(1024 * 1024).equals("1.0MB");
+        assert FileSizeFormatter.formatSize(1024L * 1024 * 1024 * 512).equals("512.0GB");
+        assert FileSizeFormatter.formatSize(1024L * 1024 * 1024 * 1024 * 512).equals("512.0TB");
+
+        // Negative values
+        assert FileSizeFormatter.formatSize(-(1024 * 512)).equals("-512.0KB");
+        assert FileSizeFormatter.formatSize(0).equals("0.0bytes");
+
+        System.out.println("All tests passed.");
+    }
+}
+
+```
+
+### Example 8
+[Code]
+import java.util.ArrayList;
+import java.util.List;
+
+public class StringListUnifier {
+
+    /**
+     * Adds asterisks to duplicate strings so that the result is unique
+     * while preserving order, length, and semantic meaning.
+     * For example: ["a", "a", "b", "a", "c"] → ["a", "a*", "b", "a**", "c"]
+     *
+     * @param inputList list of strings
+     * @return modified list with asterisks to ensure uniqueness
+     * @throws IllegalArgumentException if the list contains non-string elements
+     */
+    public static List<String> unifyStringList(List<String> inputList) {
+        if (!inputList.stream().allMatch(s -> s instanceof String)) {
+            throw new IllegalArgumentException("All elements must be strings.");
+        }
+
+        List<String> result = new ArrayList<>();
+        for (int i = 0; i < inputList.size(); i++) {
+            String current = inputList.get(i);
+            int count = 0;
+            for (int j = 0; j < i; j++) {
+                if (inputList.get(j).equals(current)) {
+                    count++;
+                }
+            }
+            result.add(current + "*".repeat(count));
+        }
+        return result;
+    }
+}
+
+[[Property]
+category: function implementation
+language: Java
+difficulty: easy
+concepts: list traversal, duplicate tracking, uniqueness enforcement, input validation
+
+[Instruction]
+Write a Java method that takes a list of strings and returns a new list where duplicates are made unique by appending asterisks (*). Each duplicate should get one more asterisk than its previous occurrence. The length and order of the list must remain unchanged. Ensure the input contains only strings and throw an error otherwise.
+
+[Response]
+This Java implementation ensures uniqueness in a list of strings by adding asterisks to subsequent duplicates:
+
+It checks that the input list only contains strings.
+
+It tracks the number of times a string has appeared before each position.
+
+It appends asterisks to duplicates based on that count.
+
+The result is a new list where all strings are unique but the original length and order are preserved.
+
+Here's how you can do it:
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+public class StringListUnifier {
+
+    public static List<String> unifyStringList(List<String> inputList) {
+        if (!inputList.stream().allMatch(s -> s instanceof String)) {
+            throw new IllegalArgumentException("All elements must be strings.");
+        }
+
+        List<String> result = new ArrayList<>();
+        for (int i = 0; i < inputList.size(); i++) {
+            String current = inputList.get(i);
+            int count = 0;
+            for (int j = 0; j < i; j++) {
+                if (inputList.get(j).equals(current)) {
+                    count++;
+                }
+            }
+            result.add(current + "*".repeat(count));
+        }
+        return result;
+    }
+}
+
+```
+
+Note that although the function is concise, it is not the most efficient solution for large lists, as the `count` method has a time complexity of O(n) for each iteration.
+
+[Tests]
+You can test the function with the provided examples to ensure it correctly encodes the strings as expected:
+
+```java
+import java.util.Arrays;
+import java.util.List;
+
+public class TestStringListUnifier {
+    public static void main(String[] args) {
+        List<String> input1 = Arrays.asList("a", "a", "b", "a", "c");
+        List<String> expected1 = Arrays.asList("a", "a*", "b", "a**", "c");
+        assert StringListUnifier.unifyStringList(input1).equals(expected1);
+
+        List<String> input2 = Arrays.asList("a", "b", "c");
+        List<String> expected2 = Arrays.asList("a", "b", "c");
+        assert StringListUnifier.unifyStringList(input2).equals(expected2);
+
+        System.out.println("All tests passed.");
+    }
+}
+```
+
+### Example 9
+[Code]
+import java.util.ArrayList;
+import java.util.List;
+
+public class DataFolder {
+
+    /**
+     * Splits a list of integers into approximately equal-sized folds.
+     * Folds differ in size by at most 1. Returns an empty list if count <= 0.
+     *
+     * @param data  the input list
+     * @param count the number of folds
+     * @return list of folds (each fold is a sublist)
+     */
+    public static List<List<Integer>> createFolds(List<Integer> data, int count) {
+        List<List<Integer>> folds = new ArrayList<>();
+
+        if (count <= 0) {
+            return folds;
+        }
+
+        int dataLength = data.size();
+        int foldSize = dataLength / count;
+        int remainder = dataLength % count;
+
+        int startIndex = 0;
+        for (int i = 0; i < count; i++) {
+            int extra = i < remainder ? 1 : 0;
+            int endIndex = startIndex + foldSize + extra;
+            folds.add(data.subList(startIndex, Math.min(endIndex, dataLength)));
+            startIndex = endIndex;
+        }
+
+        return folds;
+    }
+}
+
+
+[Property]
+category: function implementation
+language: Java
+difficulty: medium
+concepts: data partitioning, balanced fold generation, list slicing, edge case handling
+
+[Instruction]
+Write a Java method createFolds that partitions a list of integers into count folds of approximately equal size. Each fold should be a sublist of the original list, and the sizes of the folds must differ by at most 1. If the count is less than or equal to 0, return an empty list.
+
+[Response]
+This Java implementation of createFolds achieves balanced fold generation with minimal size difference:
+
+It checks for invalid input (non-positive count).
+
+It divides the total data length evenly across the desired number of folds.
+
+The remainder is distributed one by one across the first few folds.
+
+Each fold is created using subList for efficient slicing.
+
+Here’s the implementation:
+
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+public class DataFolder {
+
+    public static List<List<Integer>> createFolds(List<Integer> data, int count) {
+        List<List<Integer>> folds = new ArrayList<>();
+
+        if (count <= 0) {
+            return folds;
+        }
+
+        int dataLength = data.size();
+        int foldSize = dataLength / count;
+        int remainder = dataLength % count;
+
+        int startIndex = 0;
+        for (int i = 0; i < count; i++) {
+            int extra = i < remainder ? 1 : 0;
+            int endIndex = startIndex + foldSize + extra;
+            folds.add(data.subList(startIndex, Math.min(endIndex, dataLength)));
+            startIndex = endIndex;
+        }
+
+        return folds;
+    }
+}
+
+```
+
+This implementation ensures that each fold has an equal length with at most a difference of 1 between any two folds. It handles edge cases, such as a non-positive `count`, by returning an empty list as specified.
+
+[Tests]
+You can test your code with the provided assertions to verify that the function works correctly:
+
+```java
+import java.util.Arrays;
+import java.util.List;
+
+public class TestDataFolder {
+    public static void main(String[] args) {
+        List<Integer> range12 = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
+        List<Integer> range8 = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7);
+        List<Integer> range6 = Arrays.asList(0, 1, 2, 3, 4, 5);
+
+        assert DataFolder.createFolds(range12, 2).equals(List.of(
+                range12.subList(0, 6), range12.subList(6, 12)));
+
+        assert DataFolder.createFolds(range8, 2).equals(List.of(
+                range8.subList(0, 4), range8.subList(4, 8)));
+
+        assert DataFolder.createFolds(range6, 2).equals(List.of(
+                range6.subList(0, 3), range6.subList(3, 6)));
+
+        assert DataFolder.createFolds(range6, -5).isEmpty();
+
+        System.out.println("All tests passed.");
+    }
+}
+
+```
+
+### Example 10
+[Code]
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class DurationParser {
+
+    private static final Pattern PATTERN = Pattern.compile("(\\d+)(s|sec|m|min|h|hour|d|day)$");
+    private static final Map<String, Integer> SUFFIX_MAP = Map.of(
+        "s", 1, "sec", 1,
+        "m", 60, "min", 60,
+        "h", 3600, "hour", 3600,
+        "d", 86400, "day", 86400
+    );
+
+    /**
+     * Parses a duration string and returns the number of seconds it represents.
+     * Valid suffixes: s, sec, m, min, h, hour, d, day (case-sensitive).
+     * Example: "2min" returns 120.
+     *
+     * @param durationStr the string to parse
+     * @return total seconds as integer
+     * @throws IllegalArgumentException if the format or suffix is invalid
+     */
+    public static int parseDuration(String durationStr) {
+        Matcher matcher = PATTERN.matcher(durationStr);
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("Invalid duration: " + durationStr);
+        }
+
+        int value = Integer.parseInt(matcher.group(1));
+        String suffix = matcher.group(2);
+
+        if (!SUFFIX_MAP.containsKey(suffix)) {
+            throw new IllegalArgumentException("Invalid duration suffix: " + suffix);
+        }
+
+        return value * SUFFIX_MAP.get(suffix);
+    }
+}
+
+
+[Property]
+category: function implementation
+language: Java
+difficulty: medium
+concepts: regular expression parsing, suffix mapping with dictionary, input validation using exceptions
+
+[Instruction]
+Write a Java method that converts a string representation of a time duration into its total number of seconds. The string must include a numeric prefix and a valid time suffix (e.g., s, sec, min, hour, day) without any spaces. Use a regular expression to validate and extract the components, and raise an IllegalArgumentException for invalid formats or suffixes.
+
+[Response]
+This implementation uses:
+
+A compiled regular expression to validate and extract duration components.
+
+A Map to store unit-to-seconds mappings.
+
+IllegalArgumentException for invalid inputs.
+
+Here’s the implementation:
+
+```java
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class DurationParser {
+
+    private static final Pattern PATTERN = Pattern.compile("(\\d+)(s|sec|m|min|h|hour|d|day)$");
+    private static final Map<String, Integer> SUFFIX_MAP = Map.of(
+        "s", 1, "sec", 1,
+        "m", 60, "min", 60,
+        "h", 3600, "hour", 3600,
+        "d", 86400, "day", 86400
+    );
+
+    public static int parseDuration(String durationStr) {
+        Matcher matcher = PATTERN.matcher(durationStr);
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("Invalid duration: " + durationStr);
+        }
+
+        int value = Integer.parseInt(matcher.group(1));
+        String suffix = matcher.group(2);
+
+        if (!SUFFIX_MAP.containsKey(suffix)) {
+            throw new IllegalArgumentException("Invalid duration suffix: " + suffix);
+        }
+
+        return value * SUFFIX_MAP.get(suffix);
+    }
+}
+
+```
+
+[Tests]
+You can test your code on various valid and invalid inputs to ensure that the function behaves as expected:
+
+```java
+public class TestDurationParser {
+    public static void main(String[] args) {
+        assert DurationParser.parseDuration("15s") == 15;
+        assert DurationParser.parseDuration("2min") == 120;
+        assert DurationParser.parseDuration("1h") == 3600;
+        assert DurationParser.parseDuration("1d") == 86400;
+        assert DurationParser.parseDuration("10sec") == 10;
+        assert DurationParser.parseDuration("2hour") == 7200;
+        assert DurationParser.parseDuration("1day") == 86400;
+        assert DurationParser.parseDuration("0s") == 0;
+        assert DurationParser.parseDuration("001s") == 1;
+
+        // Exception test cases
+        for (String invalid : new String[]{"10S", "2hours", "5 mins", "h1", "100", "xyz"}) {
+            try {
+                DurationParser.parseDuration(invalid);
+                assert false : "Expected exception for input: " + invalid;
+            } catch (IllegalArgumentException e) {
+                // expected
+            }
+        }
+
+        System.out.println("All tests passed.");
+    }
+}
+```
+### Example 11
+[Code]
+import java.util.ArrayList;
+import java.util.List;
+
+public class StringEnhancer {
+    private StringBuilder string;
+    private List<String> operations;
+
+    public StringEnhancer() {
+        this.string = new StringBuilder();
+        this.operations = new ArrayList<>();
+    }
+
+    public void applyOperation(String operation) {
+        if (!operation.contains(":")) {
+            System.out.println("Invalid operation format. Expected '[opname]:[arg]'");
+            return;
+        }
+
+        String[] parts = operation.split(":", 2);
+        String opname = parts[0];
+        String arg = parts[1];
+
+        switch (opname) {
+            case "prefix":
+                string.insert(0, arg);
+                break;
+            case "suffix":
+                string.append(arg);
+                break;
+            case "lower":
+                string = new StringBuilder(string.toString().toLowerCase());
+                break;
+            case "upper":
+                string = new StringBuilder(string.toString().toUpperCase());
+                break;
+            case "replace":
+                if (!arg.contains("->")) {
+                    System.out.println("Invalid replace operation format. Expected 'replace:a->b'");
+                    return;
+                }
+                String[] replacement = arg.split("->", 2);
+                string = new StringBuilder(string.toString().replace(replacement[0], replacement[1]));
+                break;
+            default:
+                System.out.println("Unknown operation: " + opname);
+                return;
+        }
+
+        operations.add(operation);
+    }
+
+    @Override
+    public String toString() {
+        return "Current String: " + string + "\nOperations: " + String.join(", ", operations);
+    }
+}
+
+[Property]
+category: class implementation
+language: Java
+difficulty: hard
+concepts: string manipulation, operation parsing, switch-case control, user feedback on invalid input, encapsulation
+
+[Instruction]
+Write a Java class StringEnhancer that manipulates an internal string state through a central method applyOperation(String operation). The method should handle operations like adding a prefix or suffix, converting to upper or lower case, and replacing characters based on a string format: "prefix:...", "suffix:...", "lower:", "upper:", "replace:a->b". Invalid operations should be reported, and the class should maintain a history of all successful operations. The toString() method should return the current string and all operations performed.
+
+[Response]
+This Java implementation includes:
+
+A StringBuilder to manage the mutable string state.
+
+A list of operation logs.
+
+A switch block to handle known operations.
+
+Input format and argument validation for safety and robustness.
+
+Here is the complete class:
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+public class StringEnhancer {
+    private StringBuilder string;
+    private List<String> operations;
+
+    public StringEnhancer() {
+        this.string = new StringBuilder();
+        this.operations = new ArrayList<>();
+    }
+
+    public void applyOperation(String operation) {
+        if (!operation.contains(":")) {
+            System.out.println("Invalid operation format. Expected '[opname]:[arg]'");
+            return;
+        }
+
+        String[] parts = operation.split(":", 2);
+        String opname = parts[0];
+        String arg = parts[1];
+
+        switch (opname) {
+            case "prefix":
+                string.insert(0, arg);
+                break;
+            case "suffix":
+                string.append(arg);
+                break;
+            case "lower":
+                string = new StringBuilder(string.toString().toLowerCase());
+                break;
+            case "upper":
+                string = new StringBuilder(string.toString().toUpperCase());
+                break;
+            case "replace":
+                if (!arg.contains("->")) {
+                    System.out.println("Invalid replace operation format. Expected 'replace:a->b'");
+                    return;
+                }
+                String[] replacement = arg.split("->", 2);
+                string = new StringBuilder(string.toString().replace(replacement[0], replacement[1]));
+                break;
+            default:
+                System.out.println("Unknown operation: " + opname);
+                return;
+        }
+
+        operations.add(operation);
+    }
+
+    @Override
+    public String toString() {
+        return "Current String: " + string + "\nOperations: " + String.join(", ", operations);
+    }
+}
+
+```
+
+[Tests]
+To test the class, you should apply different operations and check if the string and operation history are updated correctly:
+
+```java
+public class TestStringEnhancer {
+    public static void main(String[] args) {
+        StringEnhancer enhancer = new StringEnhancer();
+        enhancer.applyOperation("prefix:Hello");
+        enhancer.applyOperation("suffix:, World!");
+        enhancer.applyOperation("lower:");
+        enhancer.applyOperation("replace:o->a");
+
+        String expectedString = "hella, warld!";
+        String expectedHistory = "prefix:Hello, suffix:, World!, lower:, replace:o->a";
+
+        assert enhancer.toString().equals("Current String: " + expectedString + "\nOperations: " + expectedHistory);
+        System.out.println("Test passed.\n" + enhancer);
+    }
+}
+
+```
+
+### Example 12
+[Code]
+import java.util.ArrayList;
+import java.util.List;
+
+public class GrowthPairFinder {
+
+    /**
+     * Finds all index pairs (i, j) in the list where:
+     * - j > i
+     * - numbers[j] >= numbers[i] + growthRatio
+     * - j - i <= maximumDistance
+     *
+     * @param numbers List of integers
+     * @param growthRatio Minimum difference between numbers[j] and numbers[i]
+     * @param maximumDistance Maximum allowed index distance between elements
+     * @return List of index pairs (i, j) satisfying the conditions
+     */
+    public static List<int[]> findPairs(List<Integer> numbers, double growthRatio, int maximumDistance) {
+        List<int[]> pairs = new ArrayList<>();
+
+        for (int i = 0; i < numbers.size(); i++) {
+            for (int j = i + 1; j <= i + maximumDistance && j < numbers.size(); j++) {
+                if (numbers.get(j) - numbers.get(i) >= growthRatio) {
+                    pairs.add(new int[]{i, j});
+                }
+            }
+        }
+
+        return pairs;
+    }
+}
+
+
+[Property]
+category: function implementation
+language: Java
+difficulty: easy
+concepts: nested iteration, index-based comparison, constraint enforcement with bounds
+
+[Instruction]
+Write a Java method that identifies all valid index pairs (i, j) in a list of integers where the element at index j is at least growthRatio greater than the one at i, and the index distance between i and j does not exceed maximumDistance. Return a list of int arrays where each array represents a valid pair.
+
+[Response]
+This Java implementation of findPairs:
+
+Uses two nested loops to check each pair of elements (i, j) with j > i.
+
+Limits the inner loop to ensure j - i <= maximumDistance.
+
+Checks if the value at j is at least growthRatio greater than the value at i.
+
+Adds valid pairs as int[] arrays to a list.
+
+Here is the implementation:
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+public class GrowthPairFinder {
+
+    public static List<int[]> findPairs(List<Integer> numbers, double growthRatio, int maximumDistance) {
+        List<int[]> pairs = new ArrayList<>();
+
+        for (int i = 0; i < numbers.size(); i++) {
+            for (int j = i + 1; j <= i + maximumDistance && j < numbers.size(); j++) {
+                if (numbers.get(j) - numbers.get(i) >= growthRatio) {
+                    pairs.add(new int[]{i, j});
+                }
+            }
+        }
+
+        return pairs;
+    }
+}
+
+```
+
+This function iterates over the pairs of elements in the list whose indices satisfy the distance constraint and stores the valid pairs that meet the growth ratio condition.
+
+[Tests]
+Test the implementation with different cases, comparing against expected output:
+
+```java
+import java.util.Arrays;
+import java.util.List;
+
+public class TestGrowthPairFinder {
+    public static void main(String[] args) {
+        List<Integer> data = Arrays.asList(30, 15, 60, 7, 77, 13, 10);
+
+        // Test 1
+        List<int[]> result1 = GrowthPairFinder.findPairs(data, 8, 3);
+        assert result1.size() == 4;  // Check count
+
+        // Test 2: Zero distance should return no pairs
+        assert GrowthPairFinder.findPairs(data, 30, 0).isEmpty();
+
+        // Test 3: All values equal
+        List<Integer> uniform = Arrays.asList(8, 8, 8, 8);
+        assert GrowthPairFinder.findPairs(uniform, 1, 2).isEmpty();
+
+        // Test 4: Empty list
+        assert GrowthPairFinder.findPairs(List.of(), 1, 3).isEmpty();
+
+        System.out.println("All tests passed.");
+    }
+}
+
+```
+
+### Example 13
+[Code]
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
+import java.util.Arrays;
+
+public class AccuracyCalculator {
+
+    /**
+     * Calculates top-k accuracy for a batch of predictions.
+     *
+     * @param predictions INDArray of shape [batchSize, numClasses]
+     * @param targets INDArray of shape [batchSize]
+     * @param k number of top predictions to consider
+     * @return top-k accuracy as a float between 0.0 and 1.0
+     */
+    public static float calculateTopKAccuracy(INDArray predictions, INDArray targets, int k) {
+        int batchSize = (int) predictions.size(0);
+        int numClasses = (int) predictions.size(1);
+        k = Math.min(k, numClasses);
+
+        int correct = 0;
+        for (int i = 0; i < batchSize; i++) {
+            INDArray row = predictions.getRow(i);
+            float[] rowData = row.toFloatVector();
+            int[] topKIndices = getTopKIndices(rowData, k);
+
+            int actual = (int) targets.getFloat(i);
+            for (int index : topKIndices) {
+                if (index == actual) {
+                    correct++;
+                    break;
+                }
+            }
+        }
+        return correct / (float) batchSize;
+    }
+
+    /**
+     * Helper method to find indices of the top-k values in an array.
+     */
+    private static int[] getTopKIndices(float[] values, int k) {
+        return Arrays.stream(values)
+                .boxed()
+                .sorted((a, b) -> Float.compare(b, a))
+                .mapToInt(val -> indexOf(values, val))
+                .distinct()
+                .limit(k)
+                .toArray();
+    }
+
+    private static int indexOf(float[] arr, float value) {
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] == value) return i;
+        }
+        return -1;
+    }
+}
+
+
+[Property]
+category: function implementation
+language: Java
+difficulty: medium
+concepts: top-k accuracy computation, tensor indexing, ND4J batch processing, robustness with fallback for k > class count
+
+[Instruction]
+Create a Java method that calculates the top-k accuracy from a batch of model predictions. Use an ND4J INDArray to represent predictions and targets. For each prediction row, determine whether the true class is within the top k highest scores. Return the top-k accuracy as a float in [0.0, 1.0].
+
+[Response]
+This Java implementation:
+
+Computes the top-k predictions using array sorting.
+
+Compares the predicted top-k indices against the true labels.
+
+Uses ND4J for tensor operations and handles edge cases like k > numClasses.
+
+Here is the implementation:
+
+```java
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
+import java.util.Arrays;
+
+public class AccuracyCalculator {
+
+    public static float calculateTopKAccuracy(INDArray predictions, INDArray targets, int k) {
+        int batchSize = (int) predictions.size(0);
+        int numClasses = (int) predictions.size(1);
+        k = Math.min(k, numClasses);
+
+        int correct = 0;
+        for (int i = 0; i < batchSize; i++) {
+            INDArray row = predictions.getRow(i);
+            float[] rowData = row.toFloatVector();
+            int[] topKIndices = getTopKIndices(rowData, k);
+
+            int actual = (int) targets.getFloat(i);
+            for (int index : topKIndices) {
+                if (index == actual) {
+                    correct++;
+                    break;
+                }
+            }
+        }
+        return correct / (float) batchSize;
+    }
+
+    private static int[] getTopKIndices(float[] values, int k) {
+        return Arrays.stream(values)
+                .boxed()
+                .sorted((a, b) -> Float.compare(b, a))
+                .mapToInt(val -> indexOf(values, val))
+                .distinct()
+                .limit(k)
+                .toArray();
+    }
+
+    private static int indexOf(float[] arr, float value) {
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] == value) return i;
+        }
+        return -1;
+    }
+}
+```
+
+The function retrieves the top k predictions' indices, aligns shapes for comparison with true labels, computes accuracy by checking matches, and returns the average accuracy as a float.
+
+[Tests]
+```java
+import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.api.ndarray.INDArray;
+
+public class TestAccuracyCalculator {
+    public static void main(String[] args) {
+        INDArray predictions = Nd4j.create(new float[][]{
+            {0.1f, 0.2f, 0.9f}, // actual: 2 (yes)
+            {1.0f, 0.2f, 0.3f}, // actual: 0 (yes)
+            {0.3f, 1.1f, 0.2f}, // actual: 1 (yes)
+            {0.6f, 0.1f, 0.3f}  // actual: 1 (no)
+        });
+        INDArray targets = Nd4j.create(new float[]{2, 0, 1, 1});
+        float accTop1 = AccuracyCalculator.calculateTopKAccuracy(predictions, targets, 1);
+        assert accTop1 == 0.75f;
+
+        INDArray preds2 = Nd4j.create(new float[][]{
+            {0.5f, -1.2f, 0.3f},
+            {-1.0f, 0.1f, 1.2f}
+        });
+        INDArray labels2 = Nd4j.create(new float[]{0, 2});
+        float accTop3 = AccuracyCalculator.calculateTopKAccuracy(preds2, labels2, 3);
+        assert accTop3 == 1.0f;
+
+        System.out.println("All tests passed.");
+    }
+}
+p_k_accuracy(preds, labels, k=5)
+assert accuracy == 1.0
+```
+
+### Example 14
+[Code]
+public class ConditionalMatchCounter {
+
+    /**
+     * Counts how many characters match between the end of str1 and start of str2.
+     *
+     * @param str1 The first string (checked from the end)
+     * @param str2 The second string (checked from the start)
+     * @param strict If true, stop at first mismatch; if false, skip mismatched characters in str1
+     * @return number of matching characters based on conditions
+     */
+    public static int countConditionalMatches(String str1, String str2, boolean strict) {
+        int i = str1.length() - 1;
+        int j = 0;
+        int count = 0;
+
+        while (i >= 0 && j < str2.length()) {
+            if (str1.charAt(i) == str2.charAt(j)) {
+                count++;
+                i--;
+                j++;
+            } else if (strict) {
+                break;
+            } else {
+                i--;
+            }
+        }
+
+        return count;
+    }
+}
+
+[Property]
+category: function implementation
+language: Java
+difficulty: easy
+concepts: 2-pointer traversal, character comparison, conditional branching with boolean flags
+
+[Instruction]
+Implement a Java method countConditionalMatches that takes two strings (str1, str2) and a boolean strict. Starting from the end of str1 and the beginning of str2, count how many characters match at corresponding positions. If strict is true, stop at the first mismatch. If strict is false, skip mismatched characters in str1 and continue. Return the count of matches.
+
+[Response]
+This method performs a conditional matching operation between the end of str1 and the start of str2. It uses two pointers:
+
+One traverses str1 in reverse.
+
+The other traverses str2 forward.
+
+It handles two modes:
+
+Strict mode stops on the first mismatch.
+
+Non-strict mode skips non-matching characters in str1.
+
+
+```java
+public class ConditionalMatchCounter {
+
+    public static int countConditionalMatches(String str1, String str2, boolean strict) {
+        int i = str1.length() - 1;
+        int j = 0;
+        int count = 0;
+
+        while (i >= 0 && j < str2.length()) {
+            if (str1.charAt(i) == str2.charAt(j)) {
+                count++;
+                i--;
+                j++;
+            } else if (strict) {
+                break;
+            } else {
+                i--;
+            }
+        }
+
+        return count;
+    }
+}
+```
+
+[Tests]
+The function can be tested with various inputs to ensure it handles both strict and non-strict cases correctly:
+
+```java
+public class TestConditionalMatchCounter {
+    public static void main(String[] args) {
+        assert ConditionalMatchCounter.countConditionalMatches("hello", "o", true) == 1;
+        assert ConditionalMatchCounter.countConditionalMatches("fancy", "nancy", false) == 2;
+        assert ConditionalMatchCounter.countConditionalMatches("abcde", "e", false) == 1;
+        assert ConditionalMatchCounter.countConditionalMatches("helicopter", "ranges", true) == 1;
+
+        assert ConditionalMatchCounter.countConditionalMatches("apple", "banana", true) == 0;
+        assert ConditionalMatchCounter.countConditionalMatches("abcdef", "xyzab", false) == 0;
+
+        assert ConditionalMatchCounter.countConditionalMatches("", "", true) == 0;
+        assert ConditionalMatchCounter.countConditionalMatches("", "", false) == 0;
+        assert ConditionalMatchCounter.countConditionalMatches("nonempty", "", true) == 0;
+        assert ConditionalMatchCounter.countConditionalMatches("", "nonempty", false) == 0;
+
+        System.out.println("All tests passed.");
+    }
+}
+```
+
+### Example 15
+[Code]
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class TextListParser {
+
+    /**
+     * Parses a phrase using commas and 'and' into a list of individual items.
+     * Removes leading/trailing whitespace from each item.
+     *
+     * Examples:
+     * - "Eeeny, Meeny, Miney, Moe" --> ["Eeeny", "Meeny", "Miney", "Moe"]
+     * - "Eeeny, Meeny, Miney, and Moe" --> ["Eeeny", "Meeny", "Miney", "Moe"]
+     * - "San Francisco and San Mateo" --> ["San Francisco", "San Mateo"]
+     */
+    public static List<String> stringToList(String phrase) {
+        List<String> result = new ArrayList<>();
+        for (String part : phrase.split(",\\s*")) {
+            result.addAll(Arrays.asList(part.split("\\s+and\\s+")));
+        }
+        List<String> trimmed = new ArrayList<>();
+        for (String item : result) {
+            String clean = item.trim();
+            if (!clean.isEmpty()) {
+                trimmed.add(clean);
+            }
+        }
+        return trimmed;
+    }
+}
+
+[Property]
+category: function implementation
+language: Java
+difficulty: easy
+concepts: string parsing, regex split, whitespace trimming, list construction
+
+[Instruction]
+Write a Java method stringToList that splits a text string into a list of items. Items are separated by commas and/or the word "and". Ensure each item is trimmed of extra whitespace and return a clean list.
+
+[Response]
+This Java implementation uses regex to:
+
+First split the input string by , (comma and optional space).
+
+Then split each fragment by " and " using another regex.
+
+Trims and filters empty items before returning the result.
+
+```java
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class TextListParser {
+
+    public static List<String> stringToList(String phrase) {
+        List<String> result = new ArrayList<>();
+        for (String part : phrase.split(",\\s*")) {
+            result.addAll(Arrays.asList(part.split("\\s+and\\s+")));
+        }
+        List<String> trimmed = new ArrayList<>();
+        for (String item : result) {
+            String clean = item.trim();
+            if (!clean.isEmpty()) {
+                trimmed.add(clean);
+            }
+        }
+        return trimmed;
+    }
+}
+```
+
+This approach ensures no empty strings are included if there are excess commas or spaces.
+
+[Tests]
+We can test this function on different input strings (e.g., with and without the "and" connector, different numbers of items):
+
+```java
+import java.util.List;
+
+public class TestTextListParser {
+    public static void main(String[] args) {
+        assert TextListParser.stringToList("Eeeny, Meeny, Miney, Moe")
+                .equals(List.of("Eeeny", "Meeny", "Miney", "Moe"));
+        assert TextListParser.stringToList("Eeeny, Meeny, Miney, and Moe")
+                .equals(List.of("Eeeny", "Meeny", "Miney", "Moe"));
+        assert TextListParser.stringToList("San Francisco and San Mateo")
+                .equals(List.of("San Francisco", "San Mateo"));
+        assert TextListParser.stringToList("Single Item")
+                .equals(List.of("Single Item"));
+
+        System.out.println("All tests passed.");
+    }
+}
+```
+
+### Example 16
+[Code]
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.security.MessageDigest;
+import java.util.Formatter;
+
+public class FileHasher {
+
+    public static class HashResults {
+        public final String md5;
+        public final String sha1;
+        public final String sha256;
+        public final String sha512;
+
+        public HashResults(String md5, String sha1, String sha256, String sha512) {
+            this.md5 = md5;
+            this.sha1 = sha1;
+            this.sha256 = sha256;
+            this.sha512 = sha512;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("MD5: %s\nSHA-1: %s\nSHA-256: %s\nSHA-512: %s", md5, sha1, sha256, sha512);
+        }
+    }
+
+    /**
+     * Computes hashes for the contents of a file at the given path.
+     * If the file doesn't exist, hashes the path string itself.
+     *
+     * @param path the path to the file or fallback string
+     * @return a HashResults object containing all 4 hash digests
+     */
+    public static HashResults computeHashes(String path) {
+        byte[] data;
+
+        try {
+            File file = new File(path);
+            if (file.exists() && file.isFile()) {
+                data = Files.readAllBytes(file.toPath());
+            } else {
+                data = path.getBytes();
+            }
+        } catch (IOException e) {
+            data = path.getBytes(); // fallback if read fails
+        }
+
+        return new HashResults(
+                digest(data, "MD5"),
+                digest(data, "SHA-1"),
+                digest(data, "SHA-256"),
+                digest(data, "SHA-512")
+        );
+    }
+
+    private static String digest(byte[] input, String algorithm) {
+        try {
+            MessageDigest md = MessageDigest.getInstance(algorithm);
+            byte[] hash = md.digest(input);
+            Formatter formatter = new Formatter();
+            for (byte b : hash) {
+                formatter.format("%02x", b);
+            }
+            String result = formatter.toString();
+            formatter.close();
+            return result;
+        } catch (Exception e) {
+            return "";
+        }
+    }
+}
+
+
+[Property]
+category: function implementation
+language: Java
+difficulty: easy
+concepts: binary content hashing, file fallback handling, digest computation with MessageDigest, structured result packaging
+
+[Instruction]
+Write a Java class that computes MD5, SHA-1, SHA-256, and SHA-512 hashes for the binary content of a file at a given path. If the file doesn't exist, hash the input string itself. Return all four hash values in a class with appropriate fields.
+
+[Response]
+This Java class:
+
+Reads file content if the path is valid.
+
+Falls back to hashing the path string if the file doesn't exist or is a directory.
+
+Uses MessageDigest to compute standard hashes.
+
+Returns the results in a simple wrapper class HashResults.
+
+```java
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.security.MessageDigest;
+import java.util.Formatter;
+
+public class FileHasher {
+
+    public static class HashResults {
+        public final String md5;
+        public final String sha1;
+        public final String sha256;
+        public final String sha512;
+
+        public HashResults(String md5, String sha1, String sha256, String sha512) {
+            this.md5 = md5;
+            this.sha1 = sha1;
+            this.sha256 = sha256;
+            this.sha512 = sha512;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("MD5: %s\nSHA-1: %s\nSHA-256: %s\nSHA-512: %s", md5, sha1, sha256, sha512);
+        }
+    }
+
+    public static HashResults computeHashes(String path) {
+        byte[] data;
+        try {
+            File file = new File(path);
+            if (file.exists() && file.isFile()) {
+                data = Files.readAllBytes(file.toPath());
+            } else {
+                data = path.getBytes();
+            }
+        } catch (IOException e) {
+            data = path.getBytes();
+        }
+
+        return new HashResults(
+                digest(data, "MD5"),
+                digest(data, "SHA-1"),
+                digest(data, "SHA-256"),
+                digest(data, "SHA-512")
+        );
+    }
+
+    private static String digest(byte[] input, String algorithm) {
+        try {
+            MessageDigest md = MessageDigest.getInstance(algorithm);
+            byte[] hash = md.digest(input);
+            Formatter formatter = new Formatter();
+            for (byte b : hash) {
+                formatter.format("%02x", b);
+            }
+            String result = formatter.toString();
+            formatter.close();
+            return result;
+        } catch (Exception e) {
+            return "";
+        }
+    }
+}
+
+```
+
+[Tests]
+To test the function, you can provide string inputs to avoid file I/O operations and verify that the hash values are correctly computed:
+
+```java
+public class TestFileHasher {
+    public static void main(String[] args) {
+        String testString = "sample path input";
+        FileHasher.HashResults result = FileHasher.computeHashes(testString);
+        System.out.println(result);
+
+        // Validate MD5 result using known digest
+        String expectedMd5 = "2c939c665e71b3f0b1a010cb984b042b";
+        assert result.md5.equals(expectedMd5);
+    }
+}
+```
+
+### Example 17
+[Code]
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+public class DuplicateCountSum {
+
+    /**
+     * Reads integers from user input and prints the sum of counts of elements that appear more than once.
+     * Uses a HashMap to count frequencies and a stream-based sum of repeated counts.
+     */
+    public static void sumRepeatedCounts() {
+        Scanner scanner = new Scanner(System.in);
+        String[] tokens = scanner.nextLine().trim().split("\\s+");
+
+        Map<Integer, Integer> frequencyMap = new HashMap<>();
+        for (String token : tokens) {
+            if (!token.isEmpty()) {
+                int num = Integer.parseInt(token);
+                frequencyMap.put(num, frequencyMap.getOrDefault(num, 0) + 1);
+            }
+        }
+
+        int sum = frequencyMap.values().stream()
+                .filter(v -> v > 1)
+                .mapToInt(Integer::intValue)
+                .sum();
+
+        System.out.println(sum);
+    }
+}
+
+[Property]
+category: function implementation
+language: Java
+difficulty: easy
+concepts: frequency counting with HashMap, input parsing, conditional summation using streams
+
+[Instruction]
+Write a Java function that takes space-separated integers from standard input, counts the frequency of each number using a HashMap, and prints the sum of the counts of elements that appear more than once. Ignore empty input or non-numeric tokens.
+
+[Response]
+This implementation:
+
+Uses a Scanner to read input from the user.
+
+Parses integers and builds a frequency map.
+
+Filters values greater than 1 and sums their frequencies using Java streams.
+Here's a function that accomplishes this:
+
+```java
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+public class DuplicateCountSum {
+
+    public static void sumRepeatedCounts() {
+        Scanner scanner = new Scanner(System.in);
+        String[] tokens = scanner.nextLine().trim().split("\\s+");
+
+        Map<Integer, Integer> frequencyMap = new HashMap<>();
+        for (String token : tokens) {
+            if (!token.isEmpty()) {
+                int num = Integer.parseInt(token);
+                frequencyMap.put(num, frequencyMap.getOrDefault(num, 0) + 1);
+            }
+        }
+
+        int sum = frequencyMap.values().stream()
+                .filter(v -> v > 1)
+                .mapToInt(Integer::intValue)
+                .sum();
+
+        System.out.println(sum);
+    }
+}
+
+```
+
+[Tests]
+We can test this program with I/O redirection to simulate user input and output. Here is an example:
+
+```java
+import java.util.Arrays;
+import java.util.Collections;
+
+public class TestDuplicateCountSum {
+    public static void main(String[] args) {
+        // Test 1: Some elements repeated
+        assert DuplicateCountSum.sumRepeatedCounts(Arrays.asList(1, 2, 2, 3, 3, 3)) == 5;
+
+        // Test 2: All elements repeated
+        assert DuplicateCountSum.sumRepeatedCounts(Arrays.asList(1, 1, 1, 1, 1)) == 5;
+
+        // Test 3: No elements repeated
+        assert DuplicateCountSum.sumRepeatedCounts(Arrays.asList(1, 2, 3, 4, 5)) == 0;
+
+        // Test 4: Empty input
+        assert DuplicateCountSum.sumRepeatedCounts(Collections.emptyList()) == 0;
+
+        // Test 5: Some repeats mixed with unique
+        assert DuplicateCountSum.sumRepeatedCounts(Arrays.asList(4, 4, 4, 5, 6, 6, 7)) == 5;
+
+        // Test 6: One element only
+        assert DuplicateCountSum.sumRepeatedCounts(Arrays.asList(99)) == 0;
+
+        System.out.println("All tests passed.");
+    }
+}
+```
+
+### Example 18
+[Code]
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.logging.*;
+import java.util.*;
+
+public class ShellCommandExecutor {
+
+    private static final Logger logger = Logger.getLogger(ShellCommandExecutor.class.getName());
+
+    static {
+        Logger rootLogger = Logger.getLogger("");
+        Handler consoleHandler = new ConsoleHandler();
+        consoleHandler.setLevel(Level.INFO);
+        rootLogger.addHandler(consoleHandler);
+        rootLogger.setLevel(Level.INFO);
+    }
+
+    public static List<String> readCommands(String filePath) {
+        List<String> commands = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                commands.add(line.trim());
+            }
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Error reading file: " + filePath, e);
+        }
+        return commands;
+    }
+
+    public static void executeCommand(String command) {
+        logger.info("Executing command: " + command);
+        try {
+            Process process = Runtime.getRuntime().exec(command);
+            Scanner sc = new Scanner(process.getInputStream());
+            while (sc.hasNextLine()) {
+                logger.info(sc.nextLine());
+            }
+            sc.close();
+            int exitCode = process.waitFor();
+            if (exitCode != 0) {
+                Scanner err = new Scanner(process.getErrorStream());
+                while (err.hasNextLine()) {
+                    logger.warning(err.nextLine());
+                }
+                err.close();
+            }
+        } catch (IOException | InterruptedException e) {
+            logger.log(Level.SEVERE, "Command failed: " + command, e);
+        }
+    }
+
+    public static void main(String[] args) {
+        String filePath = "cmd.sh"; // Replace with your actual file path if needed
+        List<String> commands = readCommands(filePath);
+        for (int i = 0; i < commands.size(); i++) {
+            logger.info(i + ": " + commands.get(i));
+            executeCommand(commands.get(i));
+        }
+    }
+}
+
+
+[Property]
+category: program implementation
+language: Java
+difficulty: medium
+concepts: file reading and command execution, input sanitization, process output streaming, error logging
+
+[Instruction]
+Write a Java program that reads shell commands line-by-line from a text file and executes them sequentially. Sanitize each line by trimming whitespace. Use Runtime.exec() for execution and log both standard output and errors. Use the Java Logger for structured error and info messages.
+
+[Response]
+This implementation includes:
+
+Reading commands from a file using BufferedReader.
+
+Sanitizing lines with trim().
+
+Executing commands with Runtime.getRuntime().exec().
+
+Reading output and error streams to capture command results.
+
+Logging via java.util.logging.
+
+
+Below is the java that demonstrates this:
+
+```java
+import java.io.*;
+import java.util.*;
+import java.util.logging.*;
+
+public class ShellCommandExecutor {
+
+    private static final Logger logger = Logger.getLogger(ShellCommandExecutor.class.getName());
+
+    static {
+        // Configure logger
+        logger.setLevel(Level.INFO);
+        ConsoleHandler handler = new ConsoleHandler();
+        handler.setFormatter(new SimpleFormatter());
+        handler.setLevel(Level.INFO);
+        logger.addHandler(handler);
+        Logger rootLogger = Logger.getLogger("");
+        for (Handler h : rootLogger.getHandlers()) {
+            h.setLevel(Level.OFF); // Disable default console handler
+        }
+    }
+
+    /**
+     * Reads commands from a file, trims whitespace, and returns them as a list.
+     */
+    public static List<String> readCommands(String filePath) {
+        List<String> commands = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (!line.trim().isEmpty()) {
+                    commands.add(line.trim());
+                }
+            }
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Failed to read file: " + filePath, e);
+        }
+        return commands;
+    }
+
+    /**
+     * Executes a single shell command and logs the output or error.
+     */
+    public static void executeCommand(String command) {
+        logger.info("Executing: " + command);
+        try {
+            Process process = Runtime.getRuntime().exec(command);
+
+            try (BufferedReader stdOut = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                 BufferedReader stdErr = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
+
+                String line;
+                while ((line = stdOut.readLine()) != null) {
+                    logger.info("OUTPUT: " + line);
+                }
+
+                int exitCode = process.waitFor();
+                if (exitCode != 0) {
+                    while ((line = stdErr.readLine()) != null) {
+                        logger.warning("ERROR: " + line);
+                    }
+                }
+            }
+
+        } catch (IOException | InterruptedException e) {
+            logger.log(Level.SEVERE, "Command failed: " + command, e);
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    /**
+     * Main method to execute all commands from the specified file.
+     */
+    public static void main(String[] args) {
+        if (args.length == 0) {
+            logger.severe("Usage: java ShellCommandExecutor <path_to_command_file>");
+            return;
+        }
+        List<String> commands = readCommands(args[0]);
+        for (int i = 0; i < commands.size(); i++) {
+            logger.info("[" + i + "] Command: " + commands.get(i));
+            executeCommand(commands.get(i));
+        }
+    }
+}
+
+```
+
+[Tests]
+Here's an example of how you can write tests for this program:
+
+```java
+import org.junit.jupiter.api.*;
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class ShellCommandExecutorTest {
+
+    private static final String TEMP_FILE = "test_cmd.sh";
+
+    @BeforeEach
+    void setup() throws IOException {
+        Files.write(Paths.get(TEMP_FILE), Arrays.asList(
+            "echo Hello",
+            "pwd",
+            "invalidcommand"
+        ));
+    }
+
+    @AfterEach
+    void cleanup() throws IOException {
+        Files.deleteIfExists(Paths.get(TEMP_FILE));
+    }
+
+    @Test
+    void testReadCommands() {
+        List<String> commands = ShellCommandExecutor.readCommands(TEMP_FILE);
+        assertEquals(3, commands.size());
+        assertEquals("echo Hello", commands.get(0));
+        assertEquals("pwd", commands.get(1));
+        assertEquals("invalidcommand", commands.get(2));
+    }
+
+    @Test
+    void testExecuteCommand_valid() {
+        // Should not throw any exception
+        assertDoesNotThrow(() -> ShellCommandExecutor.executeCommand("echo TestExecution"));
+    }
+
+    @Test
+    void testExecuteCommand_invalid() {
+        assertDoesNotThrow(() -> ShellCommandExecutor.executeCommand("nonexistent_command_xyz"));
+    }
+
+    @Test
+    void testIntegration_allCommands() {
+        List<String> commands = ShellCommandExecutor.readCommands(TEMP_FILE);
+        for (String cmd : commands) {
+            ShellCommandExecutor.executeCommand(cmd);
+        }
+    }
+}
+
+```
+
+### Example 19
+[Code]
+import java.util.ArrayList;
+import java.util.List;
+
+public class RecursiveLinearSearch {
+
+    public static class SearchResult {
+        public final int index;
+        public final List<Integer> indicesChecked;
+
+        public SearchResult(int index, List<Integer> indicesChecked) {
+            this.index = index;
+            this.indicesChecked = indicesChecked;
+        }
+
+        @Override
+        public String toString() {
+            return "Index found: " + index + ", Indices checked: " + indicesChecked;
+        }
+    }
+
+    /**
+     * Public wrapper function to start the recursive linear search.
+     */
+    public static SearchResult recursiveSearch(int[] array, int target) {
+        List<Integer> checked = new ArrayList<>();
+        int resultIndex = searchRecursive(array, target, 0, checked);
+        return new SearchResult(resultIndex, checked);
+    }
+
+    /**
+     * Recursive function to perform linear search and track visited indices.
+     */
+    private static int searchRecursive(int[] array, int target, int index, List<Integer> checked) {
+        if (index >= array.length) {
+            return -1;
+        }
+        checked.add(index);
+        if (array[index] == target) {
+            return index;
+        }
+        return searchRecursive(array, target, index + 1, checked);
+    }
+}
+
+
+[Property]
+category: program implementation
+language: Java
+difficulty: medium
+concepts: recursive search, index tracking, base condition handling, custom return object
+
+[Instruction]
+Write a Java program that performs a linear search recursively on an array, tracking and returning both the index of the target (or -1 if not found) and a list of all indices visited during the search. Wrap the result in a custom class.
+
+[Response]
+This program defines:
+
+A SearchResult class to return both the final index and all indices visited.
+
+A recursive search method with an index accumulator.
+
+A wrapper method that initiates the recursion.
+
+Here is the Java program that implements this functionality:
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+public class RecursiveLinearSearch {
+
+    public static class SearchResult {
+        public final int index;
+        public final List<Integer> indicesChecked;
+
+        public SearchResult(int index, List<Integer> indicesChecked) {
+            this.index = index;
+            this.indicesChecked = indicesChecked;
+        }
+
+        @Override
+        public String toString() {
+            return "Index found: " + index + ", Indices checked: " + indicesChecked;
+        }
+    }
+
+    public static SearchResult recursiveSearch(int[] array, int target) {
+        List<Integer> checked = new ArrayList<>();
+        int resultIndex = searchRecursive(array, target, 0, checked);
+        return new SearchResult(resultIndex, checked);
+    }
+
+    private static int searchRecursive(int[] array, int target, int index, List<Integer> checked) {
+        if (index >= array.length) {
+            return -1;
+        }
+        checked.add(index);
+        if (array[index] == target) {
+            return index;
+        }
+        return searchRecursive(array, target, index + 1, checked);
+    }
+}
+```
+
+In this program, the `search_recursive` function recursively searches for the target element in the list and appends the indices checked to the `indices_checked` list. The `recursive_search` function acts as a wrapper to initiate the recursive search and return the result along with the list of indices checked.
+
+[Tests]
+To test the implementation, we need to ensure that both the index of the target element and the list of indices checked are correct. Here are the test cases:
+
+```java
+public class TestRecursiveLinearSearch {
+    public static void main(String[] args) {
+        // Test 1: Target found
+        int[] arr1 = {2, 3, 4, 8, 5, 9, 1, 6, 5, 7, 5};
+        int target1 = 6;
+        RecursiveLinearSearch.SearchResult result1 = RecursiveLinearSearch.recursiveSearch(arr1, target1);
+        assert result1.index == 7;
+        assert result1.indicesChecked.equals(List.of(0, 1, 2, 3, 4, 5, 6, 7));
+
+        // Test 2: Target not found
+        int[] arr2 = {1, 2, 3, 4, 5};
+        int target2 = 10;
+        RecursiveLinearSearch.SearchResult result2 = RecursiveLinearSearch.recursiveSearch(arr2, target2);
+        assert result2.index == -1;
+        assert result2.indicesChecked.equals(List.of(0, 1, 2, 3, 4));
+
+        // Test 3: Target at the end
+        int[] arr3 = {5, 4, 3, 2, 1};
+        int target3 = 1;
+        RecursiveLinearSearch.SearchResult result3 = RecursiveLinearSearch.recursiveSearch(arr3, target3);
+        assert result3.index == 4;
+        assert result3.indicesChecked.equals(List.of(0, 1, 2, 3, 4));
+
+        System.out.println("All tests passed.");
+    }
+}
+```
+
+### Example 20
+[Code]
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+
+public class ClusterSegmenter {
+
+    /**
+     * Segments a randomly generated 1D array of given size into clusters based on breakpoints.
+     * @param size The total size of the array.
+     * @param breakpoints List of indices marking the end of clusters (exclusive).
+     * @return A list of arrays, each representing a segment/cluster.
+     */
+    public static List<double[]> createClusters(int size, List<Integer> breakpoints) {
+        if (size <= 0) {
+            throw new IllegalArgumentException("Array size must be positive.");
+        }
+
+        // Validate breakpoints
+        for (int point : breakpoints) {
+            if (point < 0 || point > size) {
+                throw new IllegalArgumentException("Breakpoint " + point + " is out of bounds for array of size " + size);
+            }
+        }
+
+        // Sort and build final breakpoint list with 0 and size as bounds
+        List<Integer> fullPoints = new ArrayList<>();
+        fullPoints.add(0);
+        breakpoints.stream().sorted().distinct().forEach(fullPoints::add);
+        if (breakpoints.isEmpty() || breakpoints.get(breakpoints.size() - 1) != size) {
+            fullPoints.add(size);
+        }
+
+        // Generate random array
+        double[] data = new double[size];
+        Random rand = new Random();
+        for (int i = 0; i < size; i++) {
+            data[i] = rand.nextDouble();  // values between 0.0 and 1.0
+        }
+
+        // Segment data
+        List<double[]> clusters = new ArrayList<>();
+        for (int i = 0; i < fullPoints.size() - 1; i++) {
+            int start = fullPoints.get(i);
+            int end = fullPoints.get(i + 1);
+            clusters.add(Arrays.copyOfRange(data, start, end));
+        }
+
+        return clusters;
+    }
+
+    public static void main(String[] args) {
+        int size = 10;
+        List<Integer> breakpoints = Arrays.asList(3, 6, 8);
+        List<double[]> clusters = createClusters(size, breakpoints);
+
+        for (int i = 0; i < clusters.size(); i++) {
+            System.out.println("Cluster " + i + ": " + Arrays.toString(clusters.get(i)));
+        }
+    }
+}
+
+[Property]
+category: program implementation
+language: Java
+difficulty: medium
+concepts: random array initialization, segmenting with sorted breakpoints, list slicing, error checking
+
+[Instruction]
+Write a Java program that generates an array of random double values (0.0 to 1.0), then segments this array into clusters based on a list of breakpoints. Return each cluster as a separate array. Breakpoints define the exclusive end index of each cluster. Validate array size and breakpoint boundaries.
+
+[Response]
+This Java implementation:
+
+Validates input (positive size, valid breakpoint bounds).
+
+Generates a 1D array of random doubles between 0 and 1.
+
+Builds a list of breakpoint indices including start (0) and end (size).
+
+Segments the array accordingly and returns each as a double[] cluster.
+
+```java
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
+public class ClusterSegmenter {
+
+    /**
+     * Generates a random array of doubles between 0 and 1, and segments it based on breakpoints.
+     *
+     * @param size         Size of the array (must be > 0).
+     * @param breakpoints  List of breakpoints (must be within array bounds).
+     * @return List of double arrays, each representing a segment.
+     */
+    public static List<double[]> createClusters(int size, List<Integer> breakpoints) {
+        if (size <= 0) {
+            throw new IllegalArgumentException("Array size must be positive.");
+        }
+
+        for (int bp : breakpoints) {
+            if (bp < 0 || bp > size) {
+                throw new IllegalArgumentException("Breakpoint " + bp + " is out of bounds.");
+            }
+        }
+
+        // Prepare full sorted list of segment points including start and end
+        List<Integer> points = new ArrayList<>();
+        points.add(0);
+        points.addAll(breakpoints);
+        if (!points.contains(size)) {
+            points.add(size);
+        }
+        Collections.sort(points);
+
+        // Generate random array
+        double[] data = new double[size];
+        Random rand = new Random();
+        for (int i = 0; i < size; i++) {
+            data[i] = rand.nextDouble();
+        }
+
+        // Segment array
+        List<double[]> segments = new ArrayList<>();
+        for (int i = 0; i < points.size() - 1; i++) {
+            int start = points.get(i);
+            int end = points.get(i + 1);
+            segments.add(Arrays.copyOfRange(data, start, end));
+        }
+
+        return segments;
+    }
+
+    public static void main(String[] args) {
+        int size = 10;
+        List<Integer> breakpoints = Arrays.asList(3, 6, 8);
+
+        List<double[]> clusters = createClusters(size, breakpoints);
+
+        for (int i = 0; i < clusters.size(); i++) {
+            System.out.println("Cluster " + i + ": " + Arrays.toString(clusters.get(i)));
+        }
+    }
+}
+```
+
+In this implementation, `segment_array` transforms the input data array into a list of NumPy arrays based on the provided breakpoints. The `main` function initializes a random NumPy array of a specified size and calls `segment_array` to segment the array into clusters based on the breakpoints.
+
+[Tests]
+To test the program, we can verify that the values in each cluster are within the expected range (0--1) and that the clusters are correctly segmented. Here are some test cases:
+
+```java
+import java.util.Arrays;
+import java.util.List;
+
+public class ClusterSegmenterTest {
+
+    public static void main(String[] args) {
+        runTest(10, Arrays.asList(3, 6, 8));
+        runTest(5, Arrays.asList(1));
+        runTest(10, Arrays.asList());
+        runTest(15, Arrays.asList(3, 7, 11));
+        runTest(20, Arrays.asList(5, 10, 15));
+    }
+
+    private static void runTest(int size, List<Integer> breakpoints) {
+        System.out.println("Test: size = " + size + ", breakpoints = " + breakpoints);
+
+        List<double[]> clusters = ClusterSegmenter.createClusters(size, breakpoints);
+
+        // Validate total length
+        int totalLength = clusters.stream().mapToInt(arr -> arr.length).sum();
+        assert totalLength == size : "Total length mismatch: " + totalLength + " != " + size;
+
+        // Validate range
+        for (double[] cluster : clusters) {
+            for (double val : cluster) {
+                assert val >= 0.0 && val <= 1.0 : "Value out of range: " + val;
+            }
+        }
+
+        System.out.println("✓ Passed. Clusters: " + clusters.size());
+    }
+}
+```
+
+### Example 21
+[Code]
+import java.util.*;
+
+public class MatchCounter {
+
+    /**
+     * Counts how many times the target appears in candidates, based on match case rule.
+     *
+     * @param inputList List of strings: [target, match_rule, candidate1, candidate2, ...]
+     * @return number of matches based on the rule
+     */
+    public static int countMatches(List<String> inputList) {
+        if (inputList == null || inputList.size() < 2) {
+            throw new IllegalArgumentException("Input must contain at least a target and a match rule.");
+        }
+
+        String target = inputList.get(0);
+        String matchRule = inputList.get(1);
+
+        if (!matchRule.equals("CaseSensitive") && !matchRule.equals("CaseInsensitive")) {
+            throw new IllegalArgumentException("Match rule must be 'CaseSensitive' or 'CaseInsensitive'.");
+        }
+
+        List<String> candidates = inputList.subList(2, inputList.size());
+        int count = 0;
+
+        for (String candidate : candidates) {
+            if (matchRule.equals("CaseSensitive")) {
+                if (candidate.equals(target)) {
+                    count++;
+                }
+            } else {
+                if (candidate.equalsIgnoreCase(target)) {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter input values separated by space:");
+        List<String> inputList = Arrays.asList(scanner.nextLine().split("\\s+"));
+
+        try {
+            int matches = countMatches(inputList);
+            System.out.println(matches);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+}
+
+[Property]
+category: program implementation
+language: Java
+difficulty: medium
+concepts: case-sensitive and case-insensitive string comparison, list parsing, input validation
+
+[Instruction]
+Write a Java program that takes a list of strings where the first is a target word, the second is either "CaseSensitive" or "CaseInsensitive", and the rest are candidate words. Return the number of matches between the target and candidates based on the given rule. Handle invalid rule input and missing arguments with clear error messages.
+
+[Response]
+The program:
+
+Checks for valid input structure (at least 2 items).
+
+Validates the rule ("CaseSensitive" or "CaseInsensitive").
+
+Compares candidates against the target using .equals() or .equalsIgnoreCase().
+
+
+```java
+import java.util.*;
+
+public class MatchCounter {
+
+    /**
+     * Counts the number of times the target appears in the candidate list,
+     * according to the case-sensitivity rule.
+     *
+     * @param inputList A list where:
+     *                  - index 0 is the target string,
+     *                  - index 1 is the match rule: "CaseSensitive" or "CaseInsensitive",
+     *                  - index 2+ are the candidate strings to check against.
+     * @return The number of matching candidates.
+     * @throws IllegalArgumentException if the input is malformed or the match rule is invalid.
+     */
+    public static int countMatches(List<String> inputList) {
+        if (inputList == null || inputList.size() < 2) {
+            throw new IllegalArgumentException("Input must contain at least a target and a matching rule.");
+        }
+
+        String target = inputList.get(0);
+        String rule = inputList.get(1);
+
+        if (!rule.equals("CaseSensitive") && !rule.equals("CaseInsensitive")) {
+            throw new IllegalArgumentException("Matching rule must be either 'CaseSensitive' or 'CaseInsensitive'.");
+        }
+
+        List<String> candidates = inputList.subList(2, inputList.size());
+        int count = 0;
+
+        for (String candidate : candidates) {
+            if (rule.equals("CaseSensitive")) {
+                if (candidate.equals(target)) {
+                    count++;
+                }
+            } else {
+                if (candidate.equalsIgnoreCase(target)) {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+
+    public static void main(String[] args) {
+        System.out.println("Enter input (target matchRule candidate1 candidate2 ...):");
+        Scanner scanner = new Scanner(System.in);
+        String[] input = scanner.nextLine().split("\\s+");
+        try {
+            int result = countMatches(Arrays.asList(input));
+            System.out.println("Match count: " + result);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+}
+```
+
+The `count_matches` function implements the main logic of the program, counting the occurrences of the target string among the candidate strings based on the specified matching rule. The `main` function reads the input list from the user, calls `count_matches`, and prints the count of matches.
+
+[Tests]
+You can test the program with various inputs to ensure it handles different scenarios correctly:
+
+```java
+import java.util.*;
+
+public class MatchCounterTest {
+
+    public static void main(String[] args) {
+        // Valid cases
+        assert countMatches(List.of("apple", "CaseInsensitive", "Apple", "banana", "APPLE")) == 2;
+        assert countMatches(List.of("apple", "CaseSensitive", "Apple", "banana", "APPLE")) == 0;
+        assert countMatches(List.of("apple", "CaseInsensitive", "apple", "APPLE", "aPpLe", "banana")) == 3;
+        assert countMatches(List.of("apple", "CaseSensitive", "apple", "APPLE", "aPpLe", "banana")) == 1;
+        assert countMatches(List.of("apple", "CaseInsensitive")) == 0;
+
+        // Invalid: not enough input
+        try {
+            countMatches(List.of("apple"));
+            assert false : "Expected exception for insufficient input";
+        } catch (IllegalArgumentException e) {
+            assert e.getMessage().contains("at least a target and a matching rule");
+        }
+
+        // Invalid: wrong rule
+        try {
+            countMatches(List.of("apple", "NoMatch", "Apple"));
+            assert false : "Expected exception for invalid match rule";
+        } catch (IllegalArgumentException e) {
+            assert e.getMessage().contains("Matching rule must be");
+        }
+
+        System.out.println("✓ All tests passed.");
+    }
+
+    private static int countMatches(List<String> input) {
+        return MatchCounter.countMatches(input);
+    }
+}
+
+```
